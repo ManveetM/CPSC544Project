@@ -32,11 +32,11 @@ df = pd.read_csv("combined_emotion.csv")
 # sns.barplot(x=emotionCount.index, y=emotionCount.values, palette="viridis")
 # plt.xlabel("emotion", fontsize=12)
 # plt.ylabel("Number of Samples", fontsize=12)
-# plt.title("Distribution of Samples per Langauge", fontsize=14)
+# plt.title("Distribution of Samples per Emotion", fontsize=14)
 # plt.xticks(rotation=45)
 # plt.show()
 
-exit(0)
+#exit(0)
 
 # Preprocess and tokenize
 # Preprocessing function
@@ -56,22 +56,23 @@ for emotion, group in df.groupby('emotion'):
     words = [word for sentence in group['processed'] for word in sentence]  # Flatten word list
     emotion_word_counts[emotion] = Counter(words).most_common(10)  # Get top 10 words
 
-# Used to generate one plot of common words for all emotion
-# Convert to DataFrame for visualization
-# plot_data = []
-# for emotion, words in emotion_word_counts.items():
-#     for word, count in words:
-#         plot_data.append((emotion, word, count))
+#Used to generate one plot of common words for all emotion
+#Convert to DataFrame for visualization
+plot_data = []
+for emotion, words in emotion_word_counts.items():
+    for word, count in words:
+        plot_data.append((emotion, word, count))
 
-# plot_df = pd.DataFrame(plot_data, columns=['emotion', 'word', 'count'])
+plot_df = pd.DataFrame(plot_data, columns=['emotion', 'word', 'count'])
 
-# # Plot using seaborn
-# plt.figure(figsize=(12, 6))
-# sns.barplot(data=plot_df, x='word', y='count', hue='emotion')
-# plt.xticks(rotation=45)
-# plt.title('Most Common Words Per Emotion')
-# plt.show()
+# Plot using seaborn
+plt.figure(figsize=(12, 6))
+sns.barplot(data=plot_df, x='word', y='count', hue='emotion')
+plt.xticks(rotation=45)
+plt.title('Most Common Words Per Emotion')
+plt.show()
 
+exit(0)
 # Used to generate plots of common words for each emotion 
 # Plot using subplots for each emotion
 fig, axes = plt.subplots(len(emotion_word_counts), 1, figsize=(10, 12))
