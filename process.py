@@ -23,7 +23,7 @@ def preprocess(text : str):
 
 # Initialize TFIDF vectorizer
 vectorizer = TfidfVectorizer(
-    max_features=3000, stop_words='english', max_df=0.95, min_df=5
+    max_features=3000, stop_words='english', max_df=0.95, min_df=5, ngram_range=(1, 2)
 )
 
 choice = input("Run tokenization + vectorization (y/n): ")
@@ -42,7 +42,7 @@ if choice == 'y':
     tfidfData = vectorizer.fit_transform(data['sentence'])
     t2 = time.time()
     print(f'Vecotrization takes {(t2 - t1):.2f} seconds')
-
+    
     # Save processed data as a sparse matrix
     t1 = time.time()
     save_npz(OUTPATH, tfidfData)

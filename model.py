@@ -1,8 +1,11 @@
 import pandas as pd
 from scipy.sparse import load_npz
 from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
+from sklearn.utils.class_weight import compute_class_weight
+import numpy as np
 import time
 
 DATAPATH = 'combined_emotion.csv'
@@ -28,6 +31,36 @@ def logModel(X, y):
     print(f"Accuracy is {accuracy:.4f}")
     print(f"Classification report: \n", classification_report(yTest, yPred))
 
+def mnBayes(X, y):
+    
+
+    # Train-Test split
+    XTrain, XTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=36)
+
+    # Get class weights for balancing
+    classWeights = compute_class_weight(
+        class_weight='balanced', classes=np.unique(yTrain), y=yTrain
+    )
+
+    # Convert to dictionary to assign corresponding weights to samples
+    classWeightDict = {clss: weight for clss, weight in zip(np.unique(yTrain), classWeights)}
+
+    # Assign sample weights corresponding to their class
+    sampleWeights = np.array([classWeightDict[label] for label in yTrain])
+
+    # Train Multinomial Bayes model
+    model = MultinomialNB()
+    model.fit(XTrain, yTrain, sample_weight=sampleWeights)
+
+    # Make predictions
+    yPred = model.predict(XTest)
+
+    # Evaluate model
+    accuracy = accuracy_score(yTest, yPred)
+    print("Multinomial Bayes Model")
+    print(f"Accuracy is {accuracy:.4f}")
+    print(f"Classification report: \n", classification_report(yTest, yPred))
+
 choice = input("Train model (y/n): ")
 if choice == 'y':
     # Load labels from csv
@@ -37,4 +70,5 @@ if choice == 'y':
     # Load sparse matrix
     X = load_npz(PROCPATH)
 
-    logModel(X, y)
+    #logModel(X, y)
+    mnBayes(X, y)
