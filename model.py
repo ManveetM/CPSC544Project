@@ -1,15 +1,17 @@
 import pandas as pd
 from scipy.sparse import load_npz
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, balanced_accuracy_score
 from sklearn.utils.class_weight import compute_class_weight
 import numpy as np
 import time
 
 DATAPATH = 'combined_emotion.csv'
 PROCPATH = 'processed_data.npz'
+
+cv = StratifiedKFold(n_splits=6, shuffle=True, random_state=36)
 
 def logModel(X, y):
     # Train - test split
@@ -32,8 +34,6 @@ def logModel(X, y):
     print(f"Classification report: \n", classification_report(yTest, yPred))
 
 def mnBayes(X, y):
-    
-
     # Train-Test split
     XTrain, XTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=36)
 
@@ -52,12 +52,16 @@ def mnBayes(X, y):
     model = MultinomialNB()
     model.fit(XTrain, yTrain, sample_weight=sampleWeights)
 
+    # Calculate cross validation
+    cvScore = cross_val_score(model, XTrain, yTrain, cv=cv, scoring='balanced_accuracy')
+
     # Make predictions
     yPred = model.predict(XTest)
 
     # Evaluate model
-    accuracy = accuracy_score(yTest, yPred)
+    accuracy = balanced_accuracy_score(yTest, yPred)
     print("Multinomial Bayes Model")
+    print(f"Cross-Validation Accuracy: {cvScore.mean():.4f}")
     print(f"Accuracy is {accuracy:.4f}")
     print(f"Classification report: \n", classification_report(yTest, yPred))
 
