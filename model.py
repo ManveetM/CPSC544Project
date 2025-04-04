@@ -10,6 +10,7 @@ import time
 
 DATAPATH = 'combined_emotion.csv'
 PROCPATH = 'processed_data.npz'
+LABELPATH = 'labels.npy'
 
 cv = StratifiedKFold(n_splits=6, shuffle=True, random_state=36)
 
@@ -69,7 +70,7 @@ choice = input("Train model (y/n): ")
 if choice == 'y':
     # Load labels from csv
     data = pd.read_csv(DATAPATH)
-    y = data['emotion'].values
+    y = np.load(LABELPATH, allow_pickle=True)
 
     # Load sparse matrix
     X = load_npz(PROCPATH)
